@@ -22,14 +22,15 @@ class AddViewController: UIViewController {
     
 
     @IBAction func AddButton(_ sender: Any) {
-        print("button clicked")
-        let newTodo = ToDo()
-        newTodo.important = importantSwitch.isOn
-        if let name = nameTaskField.text  {
-            newTodo.name = name
+        if let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext {
+            let newTodo = ToDo(context: context)
+            newTodo.important = importantSwitch.isOn
+            if let name = nameTaskField.text  {
+                newTodo.name = name
+            }
+            //(UIApplication.shared.delegate as? AppDelegate)?.saveContext()
         }
-        toDoTableVC?.ToDos.append(newTodo)
-        toDoTableVC?.tableView.reloadData()
+        
         navigationController?.popViewController(animated: true)
     }
     

@@ -10,22 +10,22 @@ import UIKit
 
 class TableViewController: UITableViewController {
 
-    var ToDos: [ToDo] = []
+    var ToDos  = [ToDo]()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        let toDo1 = ToDo()
-        toDo1.name = "Walk the dog"
-        toDo1.important = false
-        
-        let toDo2 = ToDo()
-        toDo2.name = "Buy Milk"
-        toDo2.important = true
-        ToDos = [toDo1,toDo2]
-        
+    override func viewWillAppear(_ animated: Bool) {
+        getToDos()
     }
     
+    func getToDos() {
+        if let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext {
+            if let toDosFromCoreData = try? context.fetch(ToDo.fetchRequest()) {
+                if let tempToDos = toDosFromCoreData as? [ToDo] {
+                    ToDos = tempToDos
+                    tableView.reloadData()
+                }
+            }
+        }
+    }
 
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -42,7 +42,10 @@ class TableViewController: UITableViewController {
         
         if currentTodo.important
         {
-            cell.textLabel?.text = " ‼ " + currentTodo.name
+            if let name = currentTodo.name{
+                cell.textLabel?.text = " ‼ " + name
+
+            }
         } else{
             cell.textLabel?.text = currentTodo.name
         }
@@ -50,7 +53,6 @@ class TableViewController: UITableViewController {
     }
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedTodo: ToDo = ToDos[indexPath.row]
-        print("segue performed \(selectedTodo.name)")
         performSegue(withIdentifier: "ModifyTodo", sender: selectedTodo)
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
